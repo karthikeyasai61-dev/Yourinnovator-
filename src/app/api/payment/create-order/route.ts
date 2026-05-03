@@ -4,13 +4,13 @@ import Razorpay from "razorpay";
 
 export const dynamic = "force-dynamic";
 
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID!,
-  key_secret: process.env.RAZORPAY_KEY_SECRET!,
-});
-
 export async function POST(request: Request) {
   try {
+    const razorpay = new Razorpay({
+      key_id: process.env.RAZORPAY_KEY_ID || "dummy",
+      key_secret: process.env.RAZORPAY_KEY_SECRET || "dummy",
+    });
+
     const cookieStore = await cookies();
     const studentId = cookieStore.get("student_auth")?.value;
     if (!studentId) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
