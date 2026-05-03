@@ -2,6 +2,7 @@
 
 import { useState, useTransition, useRef } from "react";
 import { addCourse } from "./actions";
+import { uploadFile } from "../../../../lib/upload";
 
 export default function AddCourseForm() {
   const [isPending, startTransition] = useTransition();
@@ -17,13 +18,11 @@ export default function AddCourseForm() {
     setImagePreview(URL.createObjectURL(file));
     setUploading(true);
     try {
-      const fd = new FormData();
-      fd.append("image", file);
-      const res = await fetch("/api/upload", { method: "POST", body: fd });
-      const data = await res.json();
-      if (data.url) setUploadedUrl(data.url);
-    } catch {
-      alert("Image upload failed");
+      const url = await uploadFile(file, "courses");
+      setUploadedUrl(url);
+    } catch (err: any) {
+      console.error(err);
+      alert("Image upload failed: " + err.message);
     } finally {
       setUploading(false);
     }
