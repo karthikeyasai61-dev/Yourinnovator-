@@ -34,8 +34,14 @@ export default async function Home() {
     }
   }
 
-  const coursesQuery = await adminDb.collection("courses").orderBy("createdAt", "desc").get();
-  const courses = coursesQuery.docs.map(doc => ({ id: doc.id, ...doc.data() })) as any[];
+  let courses: any[] = [];
+  let fetchError = null;
+  try {
+    const coursesQuery = await adminDb.collection("courses").orderBy("createdAt", "desc").get();
+    courses = coursesQuery.docs.map(doc => ({ id: doc.id, ...doc.data() })) as any[];
+  } catch (error: any) {
+    fetchError = error.message;
+  }
 
   return (
     <div className="main-content">
@@ -89,7 +95,15 @@ export default async function Home() {
 
         <section>
           <h2 style={{ marginBottom: "var(--spacing-md)", fontSize: "2rem" }}>Available Courses</h2>
-          {courses.length === 0 ? (
+          
+          {fetchError && (
+            <div className="glass-card" style={{ border: "1px solid red", backgroundColor: "rgba(255,0,0,0.1)", marginBottom: "1rem" }}>
+              <h3 style={{ color: "red", marginBottom: "0.5rem" }}>Database Connection Error:</h3>
+              <p style={{ fontFamily: "monospace", wordBreak: "break-all" }}>{fetchError}</p>
+            </div>
+          )}
+
+          {courses.length === 0 && !fetchError ? (
             <div className="glass-card" style={{ textAlign: "center", padding: "var(--spacing-xl)" }}>
               <h3 style={{ marginBottom: "var(--spacing-sm)" }}>No courses available yet</h3>
               <p style={{ color: "var(--text-secondary)" }}>Check back soon!</p>
