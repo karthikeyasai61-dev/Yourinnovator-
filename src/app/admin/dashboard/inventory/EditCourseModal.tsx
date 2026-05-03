@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
+import { uploadFile } from "../../../../lib/upload";
 
 interface Course {
   id: string;
@@ -26,6 +27,7 @@ export default function EditCourseModal({ course, onClose, onSaved }: { course: 
     imageUrl: course.imageUrl ?? "",
   });
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -34,6 +36,21 @@ export default function EditCourseModal({ course, onClose, onSaved }: { course: 
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    setError("");
+    try {
+      const url = await uploadFile(file, "courses");
+      setForm(prev => ({ ...prev, imageUrl: url }));
+    } catch (err: any) {
+      setError("Image upload failed: " + err.message);
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -100,9 +117,21 @@ export default function EditCourseModal({ course, onClose, onSaved }: { course: 
             <label className="form-label">Time Slots (comma-separated)</label>
             <input name="timeSlots" type="text" required className="form-input" value={form.timeSlots} onChange={handleChange} placeholder="Mon-Wed 10:00 AM, Tue-Thu 2:00 PM" />
           </div>
-          <div className="form-group" style={{ marginBottom: "1.5rem" }}>
-            <label className="form-label">Image URL</label>
-            <input name="imageUrl" type="text" className="form-input" value={form.imageUrl} onChange={handleChange} placeholder="/uploads/image.jpg" />
+          <div className="form-group">
+            <label className="form-label">Course Image</label>
+            <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
+              {form.imageUrl && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={form.imageUrl} alt="Preview" style={{ width: "80px", height: "50px", objectFit: "cover", borderRadius: "4px" }} />
+              )}
+              <div style={{ flex: 1 }}>
+                <input type="file" accept="image/*" onChange={handleImageUpload} style={{ display: "none" }} id="edit-image-upload" />
+                <label htmlFor="edit-image-upload" className="btn btn-secondary" style={{ width: "100%", fontSize: "0.85rem", padding: "0.5rem" }}>
+                  {uploading ? "Uploading..." : "Change Image"}
+                </label>
+              </div>
+            </div>
+            <input name="imageUrl" type="text" className="form-input" value={form.imageUrl} onChange={handleChange} placeholder="/uploads/image.jpg" style={{ marginTop: "0.5rem", fontSize: "0.8rem" }} />
           </div>
           <div style={{ display: "flex", gap: "1rem" }}>
             <button type="button" onClick={onClose} className="btn btn-secondary" style={{ flex: 1 }}>Cancel</button>
