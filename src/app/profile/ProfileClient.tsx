@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { uploadFile } from "../../lib/upload";
 
 interface Props {
   studentId: string;
@@ -29,22 +30,19 @@ export default function ProfileClient({
     if (!file) return;
     setUploading(true);
     try {
-      const fd = new FormData();
-      fd.append("image", file);
-      const res = await fetch("/api/upload", { method: "POST", body: fd });
-      const data = await res.json();
-      if (!data.url) throw new Error("Upload failed");
+      const url = await uploadFile(file, "profiles");
 
       // Save profile image URL to student record
       await fetch("/api/student/profile-image", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ imageUrl: data.url }),
+        body: JSON.stringify({ imageUrl: url }),
       });
 
-      setImgUrl(data.url);
-    } catch {
-      alert("Image upload failed. Please try again.");
+      setImgUrl(url);
+    } catch (err: any) {
+      console.error(err);
+      alert("Image upload failed: " + err.message);
     } finally {
       setUploading(false);
     }
