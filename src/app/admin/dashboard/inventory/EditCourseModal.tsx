@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 
 interface Course {
   id: string;
@@ -14,6 +15,7 @@ interface Course {
 }
 
 export default function EditCourseModal({ course, onClose, onSaved }: { course: Course; onClose: () => void; onSaved: (updated: Course) => void }) {
+  const [mounted, setMounted] = useState(false);
   const [form, setForm] = useState({
     title: course.title,
     description: course.description,
@@ -25,6 +27,10 @@ export default function EditCourseModal({ course, onClose, onSaved }: { course: 
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -42,7 +48,6 @@ export default function EditCourseModal({ course, onClose, onSaved }: { course: 
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Update failed");
-      // Pass the updated course back so parent can refresh state immediately
       onSaved(data.course);
     } catch (err: any) {
       setError(err.message);
@@ -51,7 +56,7 @@ export default function EditCourseModal({ course, onClose, onSaved }: { course: 
     }
   };
 
-  return (
+  const modalContent = (
     <div style={{
       position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", zIndex: 1000,
       display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem",
@@ -109,4 +114,7 @@ export default function EditCourseModal({ course, onClose, onSaved }: { course: 
       </div>
     </div>
   );
+
+  if (!mounted) return null;
+  return createPortal(modalContent, document.body);
 }
