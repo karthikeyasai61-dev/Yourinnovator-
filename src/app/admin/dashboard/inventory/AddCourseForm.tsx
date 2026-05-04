@@ -8,6 +8,7 @@ export default function AddCourseForm() {
   const [isPending, startTransition] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
   const [uploadedUrl, setUploadedUrl] = useState<string>("");
+  const [uploading, setUploading] = useState(false);
   const [slots, setSlots] = useState(["", "", ""]);
 
   const handleImageUpload = (url: string) => {
@@ -78,6 +79,7 @@ export default function AddCourseForm() {
         label="Course Poster Image"
         folder="courses"
         onUploadComplete={handleImageUpload}
+        onUploading={setUploading}
       />
 
       <button type="submit" className="btn btn-primary" style={{ width: "100%" }} disabled={isPending || uploading}>
