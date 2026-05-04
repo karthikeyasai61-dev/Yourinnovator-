@@ -165,6 +165,52 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
 }
 
+/* File Upload Dropzone */
+.file-dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  border: 2px dashed var(--border-color);
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.03);
+  transition: all 0.3s ease;
+  min-height: 120px;
+  text-align: center;
+}
+
+.file-dropzone:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: var(--text-secondary);
+}
+
+.file-dropzone.dragging {
+  background: rgba(99, 102, 241, 0.1);
+  border-color: var(--primary);
+  transform: scale(1.02);
+}
+
+.file-dropzone-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-secondary);
+}
+
+.file-dropzone-text {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.file-dropzone-preview {
+  width: 100%;
+  max-height: 200px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+}
+
 /* Animations */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(20px); }
