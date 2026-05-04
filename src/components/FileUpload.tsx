@@ -5,12 +5,13 @@ import { uploadFile } from "../../lib/upload";
 
 interface FileUploadProps {
   onUploadComplete: (url: string) => void;
+  onUploading?: (isUploading: boolean) => void;
   initialValue?: string;
   folder?: string;
   label?: string;
 }
 
-export default function FileUpload({ onUploadComplete, initialValue, folder = "general", label = "Upload Image" }: FileUploadProps) {
+export default function FileUpload({ onUploadComplete, onUploading, initialValue, folder = "general", label = "Upload Image" }: FileUploadProps) {
   const [dragActive, setDragActive] = useState(false);
   const [preview, setPreview] = useState<string | null>(initialValue || null);
   const [uploading, setUploading] = useState(false);
@@ -25,7 +26,8 @@ export default function FileUpload({ onUploadComplete, initialValue, folder = "g
 
     setError(null);
     setUploading(true);
-    
+    onUploading?.(true);
+
     // Set local preview immediately
     const localPreview = URL.createObjectURL(file);
     setPreview(localPreview);
@@ -39,6 +41,7 @@ export default function FileUpload({ onUploadComplete, initialValue, folder = "g
       setPreview(initialValue || null); // Reset to previous if failed
     } finally {
       setUploading(false);
+      onUploading?.(false);
     }
   };
 
@@ -71,7 +74,7 @@ export default function FileUpload({ onUploadComplete, initialValue, folder = "g
   return (
     <div className="form-group">
       <label className="form-label">{label}</label>
-      <div 
+      <div
         className={`file-dropzone ${dragActive ? "dragging" : ""}`}
         onDragEnter={handleDrag}
         onDragLeave={handleDrag}
@@ -79,14 +82,14 @@ export default function FileUpload({ onUploadComplete, initialValue, folder = "g
         onDrop={handleDrop}
         onClick={() => inputRef.current?.click()}
       >
-        <input 
+        <input
           ref={inputRef}
-          type="file" 
-          accept="image/*" 
-          style={{ display: "none" }} 
-          onChange={handleChange} 
+          type="file"
+          accept="image/*"
+          style={{ display: "none" }}
+          onChange={handleChange}
         />
-        
+
         {preview ? (
           <div style={{ width: "100%" }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
