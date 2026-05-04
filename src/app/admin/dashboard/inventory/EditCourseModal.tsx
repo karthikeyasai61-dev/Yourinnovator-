@@ -27,6 +27,7 @@ export default function EditCourseModal({ course, onClose, onSaved }: { course: 
     imageUrl: course.imageUrl ?? "",
   });
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -110,10 +111,11 @@ export default function EditCourseModal({ course, onClose, onSaved }: { course: 
             folder="courses"
             initialValue={form.imageUrl}
             onUploadComplete={handleImageUpload}
+            onUploading={setUploading}
           />
           <div style={{ display: "flex", gap: "1rem" }}>
             <button type="button" onClick={onClose} className="btn btn-secondary" style={{ flex: 1 }}>Cancel</button>
-            <button type="submit" className="btn btn-primary" style={{ flex: 1 }} disabled={loading}>
+            <button type="submit" className="btn btn-primary" style={{ flex: 1 }} disabled={loading || uploading}>
               {loading ? "Saving..." : "Save Changes"}
             </button>
           </div>
