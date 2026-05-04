@@ -2,30 +2,16 @@
 
 import { useState, useTransition, useRef } from "react";
 import { addCourse } from "./actions";
-import { uploadFile } from "../../../../lib/upload";
+import FileUpload from "../../../../components/admin/FileUpload";
 
 export default function AddCourseForm() {
   const [isPending, startTransition] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [uploadedUrl, setUploadedUrl] = useState<string>("");
-  const [uploading, setUploading] = useState(false);
   const [slots, setSlots] = useState(["", "", ""]);
 
-  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setImagePreview(URL.createObjectURL(file));
-    setUploading(true);
-    try {
-      const url = await uploadFile(file, "courses");
-      setUploadedUrl(url);
-    } catch (err: any) {
-      console.error(err);
-      alert("Image upload failed: " + err.message);
-    } finally {
-      setUploading(false);
-    }
+  const handleImageUpload = (url: string) => {
+    setUploadedUrl(url);
   };
 
   const handleSlotChange = (index: number, value: string) => {
@@ -42,7 +28,6 @@ export default function AddCourseForm() {
     startTransition(async () => {
       await addCourse(formData);
       formRef.current?.reset();
-      setImagePreview(null);
       setUploadedUrl("");
       setSlots(["", "", ""]);
     });
@@ -89,24 +74,11 @@ export default function AddCourseForm() {
         ))}
       </div>
 
-      <div className="form-group" style={{ marginBottom: "1.5rem" }}>
-        <label className="form-label">Course Poster Image</label>
-        <label htmlFor="image-upload" style={{
-          display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-          padding: "1.5rem", border: "2px dashed var(--border-color)", borderRadius: "8px",
-          cursor: "pointer", background: "rgba(0,0,0,0.2)", minHeight: "100px",
-        }}>
-          {imagePreview ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={imagePreview} alt="Preview" style={{ width: "100%", maxHeight: "150px", objectFit: "cover", borderRadius: "6px" }} />
-          ) : (
-            <span style={{ color: "var(--text-secondary)", fontSize: "0.9rem" }}>
-              {uploading ? "Uploading..." : "Click to upload poster image"}
-            </span>
-          )}
-        </label>
-        <input id="image-upload" type="file" accept="image/*" style={{ display: "none" }} onChange={handleImageChange} />
-      </div>
+      <FileUpload 
+        label="Course Poster Image"
+        folder="courses"
+        onUploadComplete={handleImageUpload}
+      />
 
       <button type="submit" className="btn btn-primary" style={{ width: "100%" }} disabled={isPending || uploading}>
         {isPending ? "Adding..." : "Add Course"}
