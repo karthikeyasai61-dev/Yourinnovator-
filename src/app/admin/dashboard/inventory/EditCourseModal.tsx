@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import FileUpload from "@/components/admin/FileUpload";
+import FileUpload from "@/components/FileUpload";
 
 interface Course {
   id: string;
