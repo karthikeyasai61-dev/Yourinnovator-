@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { uploadFile } from "../../lib/upload";
+import { uploadFile } from "@/lib/upload";
 
 interface FileUploadProps {
   onUploadComplete: (url: string) => void;
