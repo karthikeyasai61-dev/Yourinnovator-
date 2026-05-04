@@ -2,7 +2,7 @@
 
 import { useState, useTransition, useRef } from "react";
 import { addCourse } from "./actions";
-import FileUpload from "@/components/admin/FileUpload";
+import FileUpload from "@/components/FileUpload";
 
 export default function AddCourseForm() {
   const [isPending, startTransition] = useTransition();
